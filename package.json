@@ -1,0 +1,36 @@
+{
+  "name": "TeXme_api",
+  "version": "1.0.0",
+  "main": "target/index.js",
+  "author": "Safisyx <safisyx@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^2.8.3"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^2.0.0",
+    "@types/koa": "^2.0.45",
+    "@types/koa-bodyparser": "^4.2.0",
+    "@types/koa-multer": "^1.0.0",
+    "@types/koa-router": "^7.0.27",
+    "bcrypt": "^1.0.3",
+    "kcors": "^2.2.1",
+    "koa": "^2.5.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-multer": "^1.0.2",
+    "koa-router": "^7.4.0",
+    "pg": "^7.4.3",
+    "routing-controllers": "^0.7.7",
+    "typeorm": "^0.2.5"
+  },
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon .",
+    "watch": "tsc -w",
+    "compile": "tsc -p .",
+    "migrate": "typeorm migration:run",
+    "create-migration": "typeorm migration:create",
+    "reverse-migration": "typeorm migration:revert",
+    "generate-migration": "typeorm migration:generate"
+  }
+}
