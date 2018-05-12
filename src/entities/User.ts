@@ -32,7 +32,7 @@ export class User extends BaseEntity {
   role: Role
 
   @IsDate()
-  @Column('date', {default: 'NOW'})
+  @Column('date', {default: () => 'CURRENT_DATE'})
   joinDate: Date
 
   @IsBoolean()
