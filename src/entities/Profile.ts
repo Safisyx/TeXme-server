@@ -10,19 +10,14 @@ export class Profile extends BaseEntity {
   @IsString()
   @MinLength(2)
   @Column('text')
-  firstName: string
-
-  @IsString()
-  @MinLength(2)
-  @Column('text')
-  lastName: string
+  name: string
 
   @IsDate()
-  @Column('date')
+  @Column('date', {nullable: true})
   birthDate: Date
 
   @IsString()
-  @Column('text')
+  @Column('text', {nullable: true})
   countryOfOrigin: string
 
   @OneToOne(_ => User, user => user.profile)
