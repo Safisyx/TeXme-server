@@ -5,7 +5,7 @@ import {clientUrl, emailSender} from '../constants'
 sgMail.setApiKey(SENDGRID_KEY)
 
 export const sendSignUpMail = (email: string, token:string) => {
-  const baseUrl = `${clientUrl}/email_confirmation?token=`
+  const baseUrl = `${clientUrl}/email-confirmation?token=`
   const msg = {
     to: email,
     from: emailSender,

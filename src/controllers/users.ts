@@ -1,8 +1,10 @@
-import {JsonController, Post, Body, HttpCode } from 'routing-controllers'
+import {JsonController, Post, Body, HttpCode,
+       BadRequestError, NotFoundError } from 'routing-controllers'
+import {IsString} from 'class-validator'
 import {User, Role} from '../entities/User'
 import {Profile} from '../entities/Profile'
 import {sendSignUpMail} from '../mail/templates'
-import {signup} from '../jwt'
+import {signup,verifySignup} from '../jwt'
 
 interface UserAndProfile {
   userName: string
@@ -13,7 +15,10 @@ interface UserAndProfile {
   birthDate?: string
   countryOfOrigin: string
 }
-
+class Token{
+  @IsString()
+  token: string
+}
 @JsonController()
 export default class UserController{
   @Post('/signup')
@@ -41,6 +46,26 @@ export default class UserController{
     return {
       type: 'success',
       message: 'An email containning a link to confirm the email address has been sent'
+    }
+  }
+
+  @Post('/verify-email')
+  async verifyEmail(
+    @Body() {token}:Token
+  ){
+    const {id,email} = verifySignup(token)
+    if (!id || !email)
+      throw new BadRequestError('Almost right token but not')
+
+    const user = await User.findOne({where:{id}})
+    if (!user) throw new NotFoundError('User not found')
+    if (user.email !== email)
+      throw new BadRequestError('Not the right email')
+
+    user.emailConfirmed=true
+    await user.save()
+    return {
+      message: 'The email address has been verified'
     }
   }
 }
