@@ -4,3 +4,4 @@ node_modules/
 target/
 tmp/
 temp/
+src/mailApiKey.ts
