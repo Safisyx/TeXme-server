@@ -1,6 +1,8 @@
 import {JsonController, Post, Body, HttpCode } from 'routing-controllers'
 import {User, Role} from '../entities/User'
 import {Profile} from '../entities/Profile'
+import {sendSignUpMail} from '../mail/templates'
+import {signup} from '../jwt'
 
 interface UserAndProfile {
   userName: string
@@ -24,6 +26,21 @@ export default class UserController{
     const {userName, email, password, role} = body
     const user = User.create({userName, email, role, profile})
     await user.setPassword(password)
-    return await user.save()
+    await user.save()
+
+    const jwt=signup({ id: user.id!, email: email! })
+
+    try {
+      await sendSignUpMail(user.email, jwt)
+    } catch(err) {
+      return {
+        type: 'error',
+        message: err.message
+      }
+    }
+    return {
+      type: 'success',
+      message: 'An email containning a link to confirm the email address has been sent'
+    }
   }
 }
