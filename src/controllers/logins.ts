@@ -1,4 +1,4 @@
-import {JsonController, Post, Body, BadRequestError, NotFoundError} from 'routing-controllers'
+import {JsonController, Post, Body, BadRequestError, NotFoundError, ForbiddenError} from 'routing-controllers'
 import { IsString } from 'class-validator'
 import {User} from '../entities/User'
 import {sign} from '../jwt'
@@ -19,6 +19,9 @@ export default class LoginController{
   ){
     const user = await User.findOne({where: {email}})
     if (!user) throw new NotFoundError('User not found in the database')
+
+    if (!user.emailConfirmed)
+      throw new ForbiddenError('You need to confirm you email')
 
     if (password === '')
       throw new BadRequestError('Please give a password')
