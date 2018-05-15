@@ -1,6 +1,6 @@
-import {JsonController, Post, Body, HttpCode,
+import {JsonController, Post, Patch, Body, HttpCode,
        BadRequestError, NotFoundError } from 'routing-controllers'
-import {IsString} from 'class-validator'
+import {IsString, MinLength} from 'class-validator'
 import {User, Role} from '../entities/User'
 import {Profile} from '../entities/Profile'
 import {sendSignUpMail, sendForgotPasswordMail} from '../mail/templates'
@@ -19,6 +19,15 @@ class Token{
   @IsString()
   token: string
 }
+class PasswordReset{
+  @IsString()
+  @MinLength(8)
+  password: string
+
+  @IsString()
+  token: string
+}
+
 @JsonController()
 export default class UserController{
   @Post('/signup')
@@ -110,6 +119,26 @@ export default class UserController{
     return {
       type: 'success',
       message: 'An email containing a link to reset the password has been sent'
+    }
+  }
+
+  @Patch('/reset-password')
+  async resetPassword(
+    @Body() {password, token}: PasswordReset,
+  ){
+    const {id,email} = verifySignup(token)
+    if (!id || !email)
+      throw new BadRequestError('Almost right token but not')
+
+    const user = await User.findOne({where:{id}})
+    if (!user) throw new NotFoundError('User not found')
+    if (user.email !== email)
+      throw new BadRequestError('Not the right email')
+
+    await user.setPassword(password)
+    await user.save()
+    return {
+      message: 'Password has been reset'
     }
   }
 }
