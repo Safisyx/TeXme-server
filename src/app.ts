@@ -1,7 +1,8 @@
 import 'reflect-metadata'
-import {useKoaServer, Action, BadRequestError} from "routing-controllers"
+import {useKoaServer, Action, BadRequestError, NotFoundError} from "routing-controllers"
 import * as Koa from 'koa'
 import {verify} from './jwt'
+import {User} from './entities/User'
 import UserController from './controllers/users'
 import LoginController from './controllers/logins'
 
@@ -33,7 +34,11 @@ useKoaServer(app,{
 
       if (token) {
         const { id, role } = verify(token);
-        return { id, role }
+        const user = await User.findOne({where:{id}})
+        if (!user) throw new NotFoundError('No associate user')
+        if (user.role !== role)
+          throw new BadRequestError('Role does not match')
+        return user
       }
     }
     return undefined;
