@@ -26,3 +26,23 @@ export const sendSignUpMail = (email: string, token:string) => {
   }
   return sgMail.send(msg)
 }
+
+export const sendForgotPasswordMail = (email: string, token: string) => {
+  const baseUrl = `${clientUrl}/forgot-password?token=`
+  const msg = {
+    to: email,
+    from: emailSender,
+    subject: 'Reset password',
+    text: `Hello,\n
+             \n
+             Reset your password by going to the link below\n
+             ${baseUrl + token}\n\n
+          Cheers!`,
+    html: `<p>
+           Hello,<br/><br/>
+              Reset your password by going to the following link<br/>
+           <a href="${baseUrl + token}">${baseUrl + token}</a><br/><br/>
+           Cheers!</p>`
+  }
+  return sgMail.send(msg)
+}

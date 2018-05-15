@@ -3,7 +3,7 @@ import {JsonController, Post, Body, HttpCode,
 import {IsString} from 'class-validator'
 import {User, Role} from '../entities/User'
 import {Profile} from '../entities/Profile'
-import {sendSignUpMail} from '../mail/templates'
+import {sendSignUpMail, sendForgotPasswordMail} from '../mail/templates'
 import {signup,verifySignup} from '../jwt'
 
 interface UserAndProfile {
@@ -45,7 +45,7 @@ export default class UserController{
     }
     return {
       type: 'success',
-      message: 'An email containning a link to confirm the email address has been sent'
+      message: 'An email containing a link to confirm the email address has been sent'
     }
   }
 
@@ -87,7 +87,29 @@ export default class UserController{
     }
     return {
       type: 'success',
-      message: 'An email containning a link to confirm the email address has been sent'
+      message: 'An email containing a link to confirm the email address has been sent'
+    }
+  }
+
+  @Post('/forgot-password')
+  async forgotPassword(
+    @Body() {email}: Partial<User>
+  ){
+    const user = await User.findOne({where:{email}})
+    if (!user) throw new NotFoundError('User not found')
+    const jwt=signup({ id: user.id!, email: user.email! })
+
+    try {
+      await sendForgotPasswordMail(user.email, jwt)
+    } catch(err) {
+      return {
+        type: 'error',
+        message: err.message
+      }
+    }
+    return {
+      type: 'success',
+      message: 'An email containing a link to reset the password has been sent'
     }
   }
 }
