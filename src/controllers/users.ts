@@ -1,5 +1,6 @@
-import {JsonController, Post, Patch, Body, HttpCode,
-       BadRequestError, NotFoundError } from 'routing-controllers'
+import {JsonController, Post, Patch, Get, Body, HttpCode, Param,
+       BadRequestError, NotFoundError, ForbiddenError,
+       Authorized, CurrentUser} from 'routing-controllers'
 import {IsString, MinLength} from 'class-validator'
 import {User, Role} from '../entities/User'
 import {Profile} from '../entities/Profile'
@@ -140,5 +141,26 @@ export default class UserController{
     return {
       message: 'Password has been reset'
     }
+  }
+
+  @Authorized()
+  @Get('/users')
+  async getUsers(
+    @CurrentUser() {role}: User
+  ){
+    if (role!=='admin')
+      throw new ForbiddenError('The user is not allowed to access this')
+    return await User.find()
+  }
+
+  @Authorized()
+  @Get('/users/:userId')
+  async getUser(
+    @CurrentUser() {id, role}: User,
+    @Param('userId') userId: number,
+  ){
+    if (role!=='admin' || id!==userId)
+      throw new ForbiddenError('The user is not allowed to access this')
+    return await User.findOne({where:{id: userId}})
   }
 }
