@@ -68,4 +68,26 @@ export default class UserController{
       message: 'The email address has been verified'
     }
   }
+
+  @Post('/resend-confirmation-link')
+  async resendEmail(
+    @Body() {email}: Partial<User>
+  ){
+    const user = await User.findOne({where:{email}})
+    if (!user) throw new NotFoundError('User not found')
+    const jwt=signup({ id: user.id!, email: user.email! })
+
+    try {
+      await sendSignUpMail(user.email, jwt)
+    } catch(err) {
+      return {
+        type: 'error',
+        message: err.message
+      }
+    }
+    return {
+      type: 'success',
+      message: 'An email containning a link to confirm the email address has been sent'
+    }
+  }
 }
