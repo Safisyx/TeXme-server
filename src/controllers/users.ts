@@ -14,7 +14,8 @@ interface UserAndProfile {
   role?: Role
   name: string
   birthDate?: string
-  countryOfOrigin: string
+  countryOfOrigin?: string
+  about?: string
 }
 class Token{
   @IsString()

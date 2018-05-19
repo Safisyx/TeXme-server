@@ -20,6 +20,10 @@ export class Profile extends BaseEntity {
   @Column('text', {nullable: true})
   countryOfOrigin: string
 
+  @IsString()
+  @Column('text', {nullable: true})
+  about: string
+
   @OneToOne(_ => User, user => user.profile)
   user: User
 }
