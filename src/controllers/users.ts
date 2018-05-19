@@ -1,4 +1,4 @@
-import {JsonController, Post, Patch, Get, Body, HttpCode, Param,
+import {JsonController, Post, Patch, Get, Body, Delete, HttpCode, Param,
        BadRequestError, NotFoundError, ForbiddenError,
        Authorized, CurrentUser} from 'routing-controllers'
 import {IsString, MinLength} from 'class-validator'
@@ -162,5 +162,21 @@ export default class UserController{
     if (role!=='admin' || id!==userId)
       throw new ForbiddenError('The user is not allowed to access this')
     return await User.findOne({where:{id: userId}})
+  }
+
+  @Authorized()
+  @Delete('/users/:userId([0-9]+)')
+  async deleteUser(
+    @CurrentUser() {id, role}: User,
+    @Param('userId') userId: number
+  ){
+    const user = await User.findOne({where: {id: userId}})
+    if (!user) throw new NotFoundError('Not in the database')
+    if ((role==='user' && id!==userId) || (role==='admin' && user.emailConfirmed))
+      throw new ForbiddenError('The current user is not allowed to delete this')
+    user.remove()
+    return {
+      message: `user with id=${userId} is successfully deleted!`
+    }
   }
 }
