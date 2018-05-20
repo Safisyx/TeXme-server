@@ -5,6 +5,7 @@ import {verify} from './jwt'
 import {User} from './entities/User'
 import UserController from './controllers/users'
 import LoginController from './controllers/logins'
+import ChannelController from './controllers/channels'
 
 const app = new Koa()
 
@@ -12,7 +13,8 @@ useKoaServer(app,{
   cors: true,
   controllers: [
     UserController,
-    LoginController
+    LoginController,
+    ChannelController
   ],
   authorizationChecker: (action: Action) => {
     const header: string = action.request.headers.authorization;
