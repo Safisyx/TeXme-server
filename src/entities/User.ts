@@ -1,10 +1,12 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToMany, JoinColumn} from 'typeorm'
+import {Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToMany, OneToMany,
+   JoinColumn} from 'typeorm'
 import {BaseEntity} from 'typeorm/repository/BaseEntity'
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt'
 import {IsString, MinLength, IsEmail, IsBoolean, IsDate} from 'class-validator'
 import {Profile} from './Profile'
 import {Channel} from './Channel'
+import {Message} from './Message'
 
 export type Role = 'user'|'admin';
 
@@ -30,14 +32,17 @@ export class User extends BaseEntity {
 
   @IsString()
   @Column('text', {default:'user'})
+  @Exclude({ toPlainOnly: true })
   role: Role
 
   @IsDate()
   @Column('date', {default: () => 'CURRENT_DATE'})
+  @Exclude({ toPlainOnly: true })
   joinDate: Date
 
   @IsBoolean()
   @Column('boolean', {default: false})
+  @Exclude({ toPlainOnly: true })
   emailConfirmed: boolean
 
   @OneToOne(_ => Profile, profile => profile.user, {onDelete: 'CASCADE'})
@@ -46,6 +51,9 @@ export class User extends BaseEntity {
 
   @ManyToMany(_=> Channel, channel => channel.users)
   channels: Channel[]
+
+  @OneToMany(_=> Message, message => message.user)
+  messages: Message[]
 
   async setPassword(rawPassword: string) {
     const hash = await bcrypt.hash(rawPassword, 10);
