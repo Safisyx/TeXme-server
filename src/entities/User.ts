@@ -1,5 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToMany, OneToMany,
-   JoinColumn} from 'typeorm'
+import {Entity, PrimaryColumn, Column, OneToOne, ManyToMany, OneToMany,
+   JoinColumn, Generated} from 'typeorm'
 import {BaseEntity} from 'typeorm/repository/BaseEntity'
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt'
@@ -12,7 +12,8 @@ export type Role = 'user'|'admin';
 
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn('bigint')
+  @Generated()
   id?: number
 
   @IsString()
