@@ -4,6 +4,7 @@ import {Message} from '../entities/Message'
 import {User} from '../entities/User'
 import {Channel} from '../entities/Channel'
 import {containsUser} from '../lib/functions'
+import {io} from '../socket'
 
 @JsonController()
 export default class MessageController {
@@ -19,6 +20,19 @@ export default class MessageController {
     if (!containsUser(channel.users, user))
       throw new ForbiddenError('User not allowed to post a message in the channel')
     const message = await Message.create({body,user,channel}).save()
-    return await Message.findOne(message.id)
+
+    const userNames = channel.users.map(user=> user.userName)
+    userNames.forEach(name=>{
+      io.to(name).emit('action',{
+        type: 'ADD_MESSAGE',
+        payload: {
+          channelId,
+          body: message.body
+        }
+      })
+    })
+    return {
+      message: 'Message successfully sent'
+    }
   }
 }
