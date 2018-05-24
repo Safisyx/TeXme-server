@@ -6,6 +6,7 @@ import {User} from './entities/User'
 import UserController from './controllers/users'
 import LoginController from './controllers/logins'
 import ChannelController from './controllers/channels'
+import MessageController from './controllers/messages'
 
 const app = new Koa()
 
@@ -14,7 +15,8 @@ useKoaServer(app,{
   controllers: [
     UserController,
     LoginController,
-    ChannelController
+    ChannelController,
+    MessageController
   ],
   authorizationChecker: (action: Action) => {
     const header: string = action.request.headers.authorization;

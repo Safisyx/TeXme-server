@@ -1,14 +1,9 @@
-import {JsonController, Post, Get, Body, Authorized, CurrentUser,
-    Param, NotFoundError, ForbiddenError} from 'routing-controllers'
+import {JsonController, Post, Get, Body, Authorized, CurrentUser} from 'routing-controllers'
 import {Channel} from '../entities/Channel'
 import {User} from '../entities/User'
 import {IsArray, IsInt}  from 'class-validator'
 import {getRepository} from 'typeorm'
-
-const containsUser = (users: User[], user: User) => {
-  return users.map(u=>u.id)
-              .includes(user.id)
-}
+import {containsUser} from '../lib/functions';
 
 class ChannelCreator {
   name: string
