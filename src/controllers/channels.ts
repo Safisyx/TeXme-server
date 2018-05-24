@@ -1,8 +1,14 @@
-import {JsonController, Post, Get, Body, Authorized, CurrentUser} from 'routing-controllers'
+import {JsonController, Post, Get, Body, Authorized, CurrentUser,
+    Param, NotFoundError, ForbiddenError} from 'routing-controllers'
 import {Channel} from '../entities/Channel'
 import {User} from '../entities/User'
 import {IsArray, IsInt}  from 'class-validator'
 import {getRepository} from 'typeorm'
+
+const containsUser = (users: User[], user: User) => {
+  return users.map(u=>u.id)
+              .includes(user.id)
+}
 
 class ChannelCreator {
   name: string
@@ -34,9 +40,6 @@ export default class ChannelController {
     @CurrentUser() user: User
   ){
     const channels = await Channel.find()
-    return channels.filter(channel => {
-      return channel.users.map(u => u.id)
-                    .includes(user.id)
-    })
+    return channels.filter(channel => containsUser(channel.users, user))
   }
 }
