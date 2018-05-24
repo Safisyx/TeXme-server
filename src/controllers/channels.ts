@@ -1,4 +1,4 @@
-import {JsonController, Post, Body, Authorized, CurrentUser} from 'routing-controllers'
+import {JsonController, Post, Get, Body, Authorized, CurrentUser} from 'routing-controllers'
 import {Channel} from '../entities/Channel'
 import {User} from '../entities/User'
 import {IsArray, IsInt}  from 'class-validator'
@@ -26,5 +26,17 @@ export default class ChannelController {
         .getMany())
     await channel.save()
     return channel
+  }
+
+  @Authorized()
+  @Get('/channels')
+  async getChannels(
+    @CurrentUser() user: User
+  ){
+    const channels = await Channel.find()
+    return channels.filter(channel => {
+      return channel.users.map(u => u.id)
+                    .includes(user.id)
+    })
   }
 }
